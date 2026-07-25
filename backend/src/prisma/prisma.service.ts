@@ -10,7 +10,7 @@ export class PrismaService
     console.log('Connected to Postgresql');
   }
   async onModuleDestroy() {
-    await this.$connect();
+    await this.$disconnect();
     console.log('DB disconnected');
   }
 }
