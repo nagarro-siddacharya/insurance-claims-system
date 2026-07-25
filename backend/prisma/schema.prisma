@@ -4,13 +4,12 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url = "postgresql://postgres:root@localhost:5432/insurance_claims?schema=public"
+  url = env("DATABASE_URL")
 }
 
 model Role {
