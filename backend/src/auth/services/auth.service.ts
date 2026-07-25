@@ -14,6 +14,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
+
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
@@ -23,7 +24,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const passwordMatched = bcrypt.compare(password, user.password);
+    const passwordMatched = await bcrypt.compare(password, user.password);
 
     if (!passwordMatched) {
       throw new UnauthorizedException('Password is Invalid');
