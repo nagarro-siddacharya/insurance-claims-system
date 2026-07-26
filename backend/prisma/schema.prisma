@@ -65,6 +65,27 @@ model User {
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  claims Claim[]
+}
+
+model Claim {
+  id               String   @id @default(uuid())
+  claimNumber      String   @unique
+
+  customerId       String
+  customer         User     @relation(fields: [customerId], references: [id])
+
+  title            String
+  description      String
+
+  incidentDate     DateTime
+  incidentLocation String
+
+  status           ClaimStatus @default(SUBMITTED)
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 enum UserStatus {
@@ -72,4 +93,12 @@ enum UserStatus {
   INACTIVE
   LOCKED
   PENDING
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CLOSED
 }
