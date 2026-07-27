@@ -1,0 +1,42 @@
+export const workshops = [
+  {
+    name: 'ABC Auto Repairs',
+    address: '123 Main Street',
+    city: 'Bengaluru',
+    state: 'Karnataka',
+    phoneNumber: '+919876543210',
+    email: 'contact@abcautorepairs.com',
+  },
+  {
+    name: 'City Motors Workshop',
+    address: '45 MG Road',
+    city: 'Hyderabad',
+    state: 'Telangana',
+    phoneNumber: '+919812345678',
+    email: 'support@citymotors.com',
+  },
+  {
+    name: 'Premium Collision Center',
+    address: '78 Ring Road',
+    city: 'Pune',
+    state: 'Maharashtra',
+    phoneNumber: '+919998887776',
+    email: 'info@premiumcollision.com',
+  },
+  {
+    name: 'FastFix Garage',
+    address: '22 Park Avenue',
+    city: 'Chennai',
+    state: 'Tamil Nadu',
+    phoneNumber: '+919887766554',
+    email: 'service@fastfixgarage.com',
+  },
+  {
+    name: 'Reliable Car Care',
+    address: '56 Lake Road',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    phoneNumber: '+919765432101',
+    email: 'hello@reliablecarcare.com',
+  },
+];
