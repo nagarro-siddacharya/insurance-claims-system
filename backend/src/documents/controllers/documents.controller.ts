@@ -55,7 +55,7 @@ export class DocumentsController {
   @Post('upload/:claimId')
   upload(
     @Param('claimId') claimId: string,
-    @UploadedFile() file: any,
+    @UploadedFile() file: Express.Multer.File,
     @Request() req: any,
   ) {
     return this.documentsService.upload(claimId, file, req.user);

@@ -16,7 +16,7 @@ export class DocumentsService {
     private readonly claimsRepository: ClaimsRepository,
   ) {}
 
-  async upload(claimId: string, file: any, user: JwtUser) {
+  async upload(claimId: string, file: Express.Multer.File, user: JwtUser) {
     const claim = await this.claimsRepository.findById(claimId);
 
     if (!claim) {
