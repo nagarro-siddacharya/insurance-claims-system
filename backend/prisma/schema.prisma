@@ -12,6 +12,21 @@ datasource db {
   url = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  LOCKED
+  PENDING
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  CLOSED
+}
+
 model Role {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -86,19 +101,21 @@ model Claim {
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+
+  documents Document[]
 }
 
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-  LOCKED
-  PENDING
-}
+model Document {
+  id          String   @id @default(uuid())
 
-enum ClaimStatus {
-  SUBMITTED
-  UNDER_REVIEW
-  APPROVED
-  REJECTED
-  CLOSED
+  fileName    String
+  originalName String
+  mimeType    String
+  fileSize    Int
+  filePath    String
+
+  claimId     String
+  claim       Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  uploadedAt  DateTime @default(now())
 }
