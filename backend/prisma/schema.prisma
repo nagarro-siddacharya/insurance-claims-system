@@ -22,6 +22,13 @@ enum ClaimStatus {
   CLOSED
 }
 
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
 model Role {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -101,6 +108,7 @@ model Claim {
   updatedAt        DateTime @updatedAt
 
   documents Document[]
+  appointment Appointment?
 }
 
 model Document {
@@ -129,4 +137,21 @@ model Workshop {
   isActive    Boolean  @default(true)
 
   claims Claim[]
+  appointments Appointment[]
+}
+
+model Appointment {
+  id              String              @id @default(cuid())
+
+  appointmentDate DateTime
+
+  status          AppointmentStatus   @default(SCHEDULED)
+
+  claimId         String              @unique
+  claim           Claim               @relation(fields: [claimId], references: [id])
+
+  workshopId      String
+  workshop        Workshop            @relation(fields: [workshopId], references: [id])
+
+  createdAt       DateTime            @default(now())
 }
