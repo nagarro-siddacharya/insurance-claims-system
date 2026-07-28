@@ -7,5 +7,6 @@ import { WorkshopsRepository } from 'src/workshops/repositories/workshops.reposi
 @Module({
   controllers: [ClaimsController],
   providers: [ClaimsService, ClaimsRepository, WorkshopsRepository],
+  exports: [ClaimsRepository],
 })
 export class ClaimsModule {}

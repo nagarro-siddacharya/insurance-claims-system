@@ -74,4 +74,15 @@ export class UsersService {
       },
     });
   }
+
+  async findById(id: string) {
+    return this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        role: true,
+      },
+    });
+  }
 }

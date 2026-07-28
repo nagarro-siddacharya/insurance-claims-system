@@ -29,6 +29,12 @@ enum AppointmentStatus {
   CANCELLED
 }
 
+enum SurveyStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
 model Role {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -84,6 +90,7 @@ model User {
   updatedAt  DateTime @updatedAt
 
   claims Claim[]
+  surveys Survey[]
 }
 
 model Claim {
@@ -109,6 +116,7 @@ model Claim {
 
   documents Document[]
   appointment Appointment?
+  survey Survey?
 }
 
 model Document {
@@ -154,4 +162,25 @@ model Appointment {
   workshop        Workshop            @relation(fields: [workshopId], references: [id])
 
   createdAt       DateTime            @default(now())
+}
+
+model Survey {
+  id              String       @id @default(cuid())
+
+  claimId         String       @unique
+  claim           Claim        @relation(fields: [claimId], references: [id])
+
+  surveyorId      String
+  surveyor        User         @relation(fields: [surveyorId], references: [id])
+
+  damageDescription String
+
+  estimatedCost   Float?
+
+  reportPath      String?
+
+  status          SurveyStatus @default(PENDING)
+
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 }

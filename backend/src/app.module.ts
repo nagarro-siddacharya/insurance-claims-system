@@ -7,9 +7,20 @@ import { ClaimsModule } from './claims/claims.module';
 import { DocumentsModule } from './documents/documents.module';
 import { WorkshopsModule } from './workshops/workshops.module';
 import { AppointmentsModule } from './appointments/appointments.module';
+import { SurveysModule } from './surveys/surveys.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, RolesModule, AuthModule, ClaimsModule, DocumentsModule, WorkshopsModule, AppointmentsModule],
+  imports: [
+    PrismaModule,
+    UsersModule,
+    RolesModule,
+    AuthModule,
+    ClaimsModule,
+    DocumentsModule,
+    WorkshopsModule,
+    AppointmentsModule,
+    SurveysModule,
+  ],
   controllers: [],
   providers: [],
 })
