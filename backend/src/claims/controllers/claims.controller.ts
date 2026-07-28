@@ -14,6 +14,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { JwtUser } from 'src/common/interfaces/jwt-user.interface';
 import { UpdateClaimStatusDto } from '../dto/update-claim-status.dto';
+import { AssignWorkshopDto } from '../dto/assign-workshop.dto';
 
 @ApiTags('Claims')
 @ApiBearerAuth()
@@ -55,5 +56,21 @@ export class ClaimsController {
   ) {
     const user = req.user;
     return this.claimsService.updateClaimStatus(claimId, dto, user);
+  }
+
+  @Patch(':id/assign-workshop')
+  @ApiOperation({ summary: 'Assign a workshop to a claim' })
+  @UseGuards(JwtAuthGuard)
+  async assignWorkshop(
+    @Request() req: { user: JwtUser },
+    @Param('id') claimId: string,
+    @Body() assignWorkshopDto: AssignWorkshopDto,
+  ) {
+    const user = req.user;
+    return this.claimsService.assignWorkshop(
+      claimId,
+      assignWorkshopDto.workshopId,
+      user,
+    );
   }
 }

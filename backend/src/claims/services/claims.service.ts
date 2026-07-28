@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,10 +10,14 @@ import { RoleName } from 'src/common/enums/roles.enum';
 import { JwtUser } from 'src/common/interfaces/jwt-user.interface';
 import { ClaimStatus } from '@prisma/client';
 import { UpdateClaimStatusDto } from '../dto/update-claim-status.dto';
+import { WorkshopsRepository } from 'src/workshops/repositories/workshops.repository';
 
 @Injectable()
 export class ClaimsService {
-  constructor(private readonly claimsRepository: ClaimsRepository) {}
+  constructor(
+    private readonly claimsRepository: ClaimsRepository,
+    private readonly workshopsRepository: WorkshopsRepository,
+  ) {}
 
   async create(createClaimDto: CreateClaimDto, customerId: string) {
     const claimNumber = await this.generateClaimNumber();
@@ -91,5 +96,23 @@ export class ClaimsService {
       CLOSED: [],
     };
     return validTransitions[current].includes(next);
+  }
+
+  async assignWorkshop(claimId: string, workshopId: string, user: JwtUser) {
+    const claim = await this.claimsRepository.findById(claimId);
+    if (!claim) {
+      throw new NotFoundException('Claim not found');
+    }
+    const workshop = await this.workshopsRepository.findById(workshopId);
+    if (!workshop) {
+      throw new NotFoundException('Workshop not found');
+    }
+    if (!workshop.isActive) {
+      throw new BadRequestException('Workshop is not active');
+    }
+    if (user.role === RoleName.CUSTOMER && user.id !== claim.customerId) {
+      throw new UnauthorizedException('Unauthorized Access');
+    }
+    return this.claimsRepository.assignWorkshop(claimId, workshopId);
   }
 }

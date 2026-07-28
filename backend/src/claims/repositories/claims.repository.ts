@@ -54,4 +54,12 @@ export class ClaimsRepository {
       data: { status },
     });
   }
+
+  async assignWorkshop(claimId: string, workshopId: string) {
+    return this.prismaService.claim.update({
+      where: { id: claimId },
+      data: { workshopId },
+      include: { workshop: true },
+    });
+  }
 }
