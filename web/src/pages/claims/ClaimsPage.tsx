@@ -86,6 +86,7 @@ return (
         columns={columns}
         getRowId={(row) => row.id}
         pageSizeOptions={[5, 10, 20]}
+        onRowClick={(params) => navigate(`/claims/${params.row.id}`)}
       />
     </Box>
   </Box>

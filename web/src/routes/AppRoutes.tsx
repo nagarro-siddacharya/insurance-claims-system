@@ -6,6 +6,7 @@ import MainLayout from "../layouts/MainLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import ClaimsPage from "../pages/claims/ClaimsPage";
 import CreateClaimPage from "../pages/claims/CreateClaimPage";
+import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
 
 export default function AppRoutes() {
   return (
@@ -26,6 +27,7 @@ export default function AppRoutes() {
 
           <Route path="/claims" element={<ClaimsPage />} />
           <Route path="/claims/new" element={<CreateClaimPage />} />
+          <Route path="/claims/:id" element={<ClaimDetailsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

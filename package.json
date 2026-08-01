@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/multer": "^2.2.0"
+  },
+  "dependencies": {
+    "@mui/x-data-grid": "^9.10.1"
+  }
+}
