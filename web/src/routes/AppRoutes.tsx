@@ -7,6 +7,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import ClaimsPage from "../pages/claims/ClaimsPage";
 import CreateClaimPage from "../pages/claims/CreateClaimPage";
 import ClaimDetailsPage from "../pages/claims/ClaimDetailsPage";
+import WorkshopsPage from "../pages/workshops/WorkshopsPage";
+import WorkshopDetailsPage from "../pages/workshops/WorkshopDetailsPage";
 
 export default function AppRoutes() {
   return (
@@ -28,6 +30,9 @@ export default function AppRoutes() {
           <Route path="/claims" element={<ClaimsPage />} />
           <Route path="/claims/new" element={<CreateClaimPage />} />
           <Route path="/claims/:id" element={<ClaimDetailsPage />} />
+
+          <Route path="/workshops" element={<WorkshopsPage />} />
+          <Route path="/workshops/:id" element={<WorkshopDetailsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

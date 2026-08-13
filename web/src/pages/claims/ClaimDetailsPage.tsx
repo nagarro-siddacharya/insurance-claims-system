@@ -14,10 +14,14 @@ import { useQuery } from "@tanstack/react-query";
 import ClaimStatusChip from "../../components/common/ClaimStatusChip";
 import { ArrowBack } from "@mui/icons-material";
 import ClaimDocuments from "../../components/documents/ClaimDocuments";
+import { useState } from "react";
+import AssignWorkshopDialog from "../../components/common/AssignWorkshopDialog";
+import workshopsService from "../../services/workshops.service";
 
 export default function ClaimDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [assignDialogOpen, setAssignDialogOpen] = useState(false);
 
   const {
     data: claim,
@@ -27,6 +31,12 @@ export default function ClaimDetailsPage() {
     queryKey: ["claim", id],
     queryFn: () => claimsService.getClaim(id!),
     enabled: !!id,
+  });
+
+  const { data: workshop, isLoading: workshopLoading } = useQuery({
+    queryKey: ["workshop", claim?.workshopId],
+    queryFn: () => workshopsService.getWorkshop(claim!.workshopId!),
+    enabled: !!claim?.workshopId,
   });
 
   if (isLoading) {
@@ -95,6 +105,70 @@ export default function ClaimDetailsPage() {
         </Box>
       </Paper>
       <ClaimDocuments claimId={claim.id} />
+      <AssignWorkshopDialog
+        open={assignDialogOpen}
+        onClose={() => setAssignDialogOpen(false)}
+        claimId={claim.id}
+      />
+      <Paper sx={{ p: 3, mt: 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6">Workshop</Typography>
+
+          {!claim.workshopId && (
+            <Button
+              variant="contained"
+              size="small"
+              onClick={() => setAssignDialogOpen(true)}
+            >
+              Assign Workshop
+            </Button>
+          )}
+        </Box>
+
+        {claim.workshopId ? (
+          <>
+            {workshopLoading ? (
+              <CircularProgress size={24} />
+            ) : workshop ? (
+              <Stack spacing={1}>
+                <Typography variant="h6">{workshop.name}</Typography>
+
+                <Typography>{workshop.address}</Typography>
+
+                <Typography>
+                  {workshop.city}, {workshop.state}
+                </Typography>
+
+                <Typography>{workshop.phoneNumber}</Typography>
+
+                <Typography>{workshop.email}</Typography>
+
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate(`/workshops/${workshop.id}`)}
+                >
+                  View Workshop
+                </Button>
+              </Stack>
+            ) : (
+              <Typography color="error">
+                Unable to load workshop details.
+              </Typography>
+            )}
+          </>
+        ) : (
+          <Typography color="text.secondary">
+            No workshop assigned yet.
+          </Typography>
+        )}
+      </Paper>
     </Box>
   );
 }
