@@ -88,14 +88,30 @@ export class ClaimsService {
     current: ClaimStatus,
     next: ClaimStatus,
   ): Promise<boolean> {
-    const validTransitions: Record<ClaimStatus, ClaimStatus[]> = {
-      SUBMITTED: [ClaimStatus.UNDER_REVIEW],
-      UNDER_REVIEW: [ClaimStatus.APPROVED, ClaimStatus.REJECTED],
-      APPROVED: [ClaimStatus.CLOSED],
-      REJECTED: [],
+    const transitions: Record<ClaimStatus, ClaimStatus[]> = {
+      SUBMITTED: [ClaimStatus.CASE_ASSIGNED],
+
+      CASE_ASSIGNED: [ClaimStatus.SURVEY_PENDING],
+
+      SURVEY_PENDING: [ClaimStatus.SURVEY_COMPLETED],
+
+      SURVEY_COMPLETED: [ClaimStatus.ADJUDICATION_PENDING],
+
+      ADJUDICATION_PENDING: [ClaimStatus.APPROVED, ClaimStatus.REJECTED],
+
+      APPROVED: [ClaimStatus.REPAIR_IN_PROGRESS],
+
+      REJECTED: [ClaimStatus.CLOSED],
+
+      REPAIR_IN_PROGRESS: [ClaimStatus.REPAIR_COMPLETED],
+
+      REPAIR_COMPLETED: [ClaimStatus.PAYMENT_PENDING],
+
+      PAYMENT_PENDING: [ClaimStatus.CLOSED],
+
       CLOSED: [],
     };
-    return validTransitions[current].includes(next);
+    return transitions[current].includes(next);
   }
 
   async assignWorkshop(claimId: string, workshopId: string, user: JwtUser) {

@@ -8,6 +8,7 @@ import { DocumentsModule } from './documents/documents.module';
 import { WorkshopsModule } from './workshops/workshops.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { SurveysModule } from './surveys/surveys.module';
+import { CaseManagementModule } from './case-management/case-management.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SurveysModule } from './surveys/surveys.module';
     WorkshopsModule,
     AppointmentsModule,
     SurveysModule,
+    CaseManagementModule,
   ],
   controllers: [],
   providers: [],

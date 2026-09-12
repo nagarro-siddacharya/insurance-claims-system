@@ -16,9 +16,15 @@ enum UserStatus {
 
 enum ClaimStatus {
   SUBMITTED
-  UNDER_REVIEW
+  CASE_ASSIGNED
+  SURVEY_PENDING
+  SURVEY_COMPLETED
+  ADJUDICATION_PENDING
   APPROVED
   REJECTED
+  REPAIR_IN_PROGRESS
+  REPAIR_COMPLETED
+  PAYMENT_PENDING
   CLOSED
 }
 
@@ -91,6 +97,8 @@ model User {
 
   claims Claim[]
   surveys Survey[]
+  caseManagerAssignments CaseAssignment[] @relation("CaseManagerAssignments")
+  surveyorAssignments CaseAssignment[] @relation("SurveyorAssignments")
 }
 
 model Claim {
@@ -117,6 +125,7 @@ model Claim {
   documents Document[]
   appointment Appointment?
   survey Survey?
+  caseAssignment CaseAssignment?
 }
 
 model Document {
@@ -183,4 +192,20 @@ model Survey {
 
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+}
+
+model CaseAssignment {
+  id            String   @id @default(cuid())
+  claimId       String   @unique
+  caseManagerId String
+  surveyorId    String?
+  assignedAt    DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  claim       Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  caseManager User  @relation("CaseManagerAssignments", fields: [caseManagerId], references: [id])
+  surveyor    User? @relation("SurveyorAssignments", fields: [surveyorId], references: [id])
+
+  @@index([caseManagerId])
+  @@index([surveyorId])
 }

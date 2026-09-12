@@ -29,3 +29,6 @@ Thumbs.db
 
 # Generated files
 **/.turbo
+backend/yarn.lock
+mobile/yarn.lock
+web/yarn.lock
