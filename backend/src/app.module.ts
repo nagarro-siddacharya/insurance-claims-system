@@ -9,6 +9,7 @@ import { WorkshopsModule } from './workshops/workshops.module';
 import { AppointmentsModule } from './appointments/appointments.module';
 import { SurveysModule } from './surveys/surveys.module';
 import { CaseManagementModule } from './case-management/case-management.module';
+import { AdjudicationModule } from './adjudication/adjudication.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CaseManagementModule } from './case-management/case-management.module';
     AppointmentsModule,
     SurveysModule,
     CaseManagementModule,
+    AdjudicationModule,
   ],
   controllers: [],
   providers: [],

@@ -99,6 +99,7 @@ model User {
   surveys Survey[]
   caseManagerAssignments CaseAssignment[] @relation("CaseManagerAssignments")
   surveyorAssignments CaseAssignment[] @relation("SurveyorAssignments")
+  adjudications Adjudication[] @relation("AdjusterAdjudications")
 }
 
 model Claim {
@@ -126,6 +127,7 @@ model Claim {
   appointment Appointment?
   survey Survey?
   caseAssignment CaseAssignment?
+  adjudication Adjudication?
 }
 
 model Document {
@@ -192,6 +194,23 @@ model Survey {
 
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
+}
+
+model Adjudication {
+  id             String   @id @default(cuid())
+  claimId        String   @unique
+  adjusterId     String
+  decision       ClaimStatus
+  approvedAmount Float?
+  decisionReason String
+  decidedAt      DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  claim    Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  adjuster User  @relation("AdjusterAdjudications", fields: [adjusterId], references: [id])
+
+  @@index([adjusterId])
 }
 
 model CaseAssignment {

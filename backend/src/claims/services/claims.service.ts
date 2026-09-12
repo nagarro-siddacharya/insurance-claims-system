@@ -71,47 +71,77 @@ export class ClaimsService {
     if (!claim) {
       throw new NotFoundException('Claim not found');
     }
-    if (user.role === RoleName.ADMIN || user.role === RoleName.CASE_MANAGER) {
-      const isValidTransition = await this.isValidTransition(
-        claim.status,
-        dto.status,
-      );
-      if (!isValidTransition) {
-        throw new UnauthorizedException('Invalid status transition');
-      }
-      return this.claimsRepository.updateClaimStatus(claimId, dto.status);
+    const allowedRoles = [
+      RoleName.ADMIN,
+      RoleName.CASE_MANAGER,
+      RoleName.ADJUSTER,
+      RoleName.SURVEYOR,
+      RoleName.WORKSHOP,
+    ];
+    if (!allowedRoles.includes(user.role as RoleName)) {
+      throw new UnauthorizedException('Unauthorized Access');
     }
-    throw new UnauthorizedException('Unauthorized Access');
+
+    if (!this.isRoleAllowedForTransition(user.role as RoleName, dto.status)) {
+      throw new UnauthorizedException(
+        'Role is not allowed to perform this transition',
+      );
+    }
+
+    if (!this.isValidTransition(claim.status, dto.status)) {
+      throw new BadRequestException('Invalid status transition');
+    }
+
+    return this.claimsRepository.updateClaimStatus(claimId, dto.status);
   }
 
-  private async isValidTransition(
-    current: ClaimStatus,
-    next: ClaimStatus,
-  ): Promise<boolean> {
-    const transitions: Record<ClaimStatus, ClaimStatus[]> = {
+  private isValidTransition(current: ClaimStatus, next: ClaimStatus): boolean {
+    const validTransitions: Record<ClaimStatus, ClaimStatus[]> = {
       SUBMITTED: [ClaimStatus.CASE_ASSIGNED],
-
       CASE_ASSIGNED: [ClaimStatus.SURVEY_PENDING],
-
       SURVEY_PENDING: [ClaimStatus.SURVEY_COMPLETED],
-
       SURVEY_COMPLETED: [ClaimStatus.ADJUDICATION_PENDING],
-
       ADJUDICATION_PENDING: [ClaimStatus.APPROVED, ClaimStatus.REJECTED],
-
       APPROVED: [ClaimStatus.REPAIR_IN_PROGRESS],
-
-      REJECTED: [ClaimStatus.CLOSED],
-
+      REJECTED: [],
       REPAIR_IN_PROGRESS: [ClaimStatus.REPAIR_COMPLETED],
-
       REPAIR_COMPLETED: [ClaimStatus.PAYMENT_PENDING],
-
       PAYMENT_PENDING: [ClaimStatus.CLOSED],
-
       CLOSED: [],
     };
-    return transitions[current].includes(next);
+    return validTransitions[current].includes(next);
+  }
+
+  private isRoleAllowedForTransition(
+    role: RoleName,
+    next: ClaimStatus,
+  ): boolean {
+    if (role === RoleName.ADMIN) return true;
+    if (role === RoleName.CASE_MANAGER) {
+      return (
+        [
+          ClaimStatus.CASE_ASSIGNED,
+          ClaimStatus.SURVEY_PENDING,
+          ClaimStatus.ADJUDICATION_PENDING,
+        ] as ClaimStatus[]
+      ).includes(next);
+    }
+
+    if (role === RoleName.ADJUSTER) {
+      return (
+        [ClaimStatus.APPROVED, ClaimStatus.REJECTED] as ClaimStatus[]
+      ).includes(next);
+    }
+
+    if (role === RoleName.WORKSHOP) {
+      return (
+        [
+          ClaimStatus.REPAIR_IN_PROGRESS,
+          ClaimStatus.REPAIR_COMPLETED,
+        ] as ClaimStatus[]
+      ).includes(next);
+    }
+    return false;
   }
 
   async assignWorkshop(claimId: string, workshopId: string, user: JwtUser) {
