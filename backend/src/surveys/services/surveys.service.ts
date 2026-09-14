@@ -8,6 +8,7 @@ import { CreateSurveyDto } from '../dto/create-survey.dto';
 import { ClaimsRepository } from 'src/claims/repositories/claims.repository';
 import { RoleName } from 'src/common/enums/roles.enum';
 import { UsersService } from 'src/users/services/users.service';
+import { ClaimStatus } from '@prisma/client';
 
 @Injectable()
 export class SurveysService {
@@ -22,6 +23,13 @@ export class SurveysService {
 
     if (!claim) {
       throw new NotFoundException('Claim not found');
+    }
+
+    if (
+      claim.status !== ClaimStatus.CASE_ASSIGNED &&
+      claim.status !== ClaimStatus.SURVEY_PENDING
+    ) {
+      throw new BadRequestException('Claim is not ready for survey');
     }
 
     const surveyor = await this.usersService.findById(
@@ -42,12 +50,49 @@ export class SurveysService {
       throw new BadRequestException('Survey already exists for this claim');
     }
 
-    return this.surveysRepository.create({
+    const survey = await this.surveysRepository.create({
       claimId: claim.id,
       surveyorId: surveyor.id,
       damageDescription: createSurveyDto.damageDescription,
       estimatedCost: createSurveyDto.estimatedCost,
     });
+
+    await this.claimsRepository.updateClaimStatus(
+      claim.id,
+      ClaimStatus.SURVEY_PENDING,
+    );
+
+    return survey;
+  }
+
+  async complete(id: string) {
+    const survey = await this.surveysRepository.findById(id);
+
+    if (!survey) {
+      throw new NotFoundException('Survey not found');
+    }
+
+    const claim = await this.claimsRepository.findById(survey.claimId);
+
+    if (!claim) {
+      throw new NotFoundException('Claim not found');
+    }
+
+    if (claim.status !== ClaimStatus.SURVEY_PENDING) {
+      throw new BadRequestException('Claim is not pending survey completion');
+    }
+
+    await this.claimsRepository.updateClaimStatus(
+      claim.id,
+      ClaimStatus.SURVEY_COMPLETED,
+    );
+
+    await this.claimsRepository.updateClaimStatus(
+      claim.id,
+      ClaimStatus.ADJUDICATION_PENDING,
+    );
+
+    return this.surveysRepository.findById(id);
   }
 
   async findById(id: string) {

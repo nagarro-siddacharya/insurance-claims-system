@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -36,5 +44,13 @@ export class SurveysController {
   })
   findByClaimId(@Param('claimId') claimId: string) {
     return this.surveysService.findByClaimId(claimId);
+  }
+
+  @Patch(':id/complete')
+  @ApiOperation({
+    summary: 'Complete survey',
+  })
+  complete(@Param('id') id: string) {
+    return this.surveysService.complete(id);
   }
 }

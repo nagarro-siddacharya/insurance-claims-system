@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 enum UserStatus {
@@ -41,28 +41,34 @@ enum SurveyStatus {
   COMPLETED
 }
 
-model Role {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  isActive    Boolean  @default(true)
+enum RepairStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   permissions RolePermission[]
-  users User[]
+  users       User[]
 }
 
 model Permission {
-  id          String   @id @default(uuid())
-  name        String   @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   module      String
   action      String
   description String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   roles RolePermission[]
 }
@@ -78,134 +84,136 @@ model RolePermission {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  firstName  String
-  lastName   String
-  email      String   @unique
-  password   String
-  phone      String?
+  id        String  @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  password  String
+  phone     String?
 
-  roleId     String
-  role       Role     @relation(fields: [roleId], references: [id])
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id])
 
-  status     UserStatus @default(ACTIVE)
+  status UserStatus @default(ACTIVE)
 
-  lastLogin  DateTime?
+  lastLogin DateTime?
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  claims Claim[]
-  surveys Survey[]
+  claims                 Claim[]
+  surveys                Survey[]
   caseManagerAssignments CaseAssignment[] @relation("CaseManagerAssignments")
-  surveyorAssignments CaseAssignment[] @relation("SurveyorAssignments")
-  adjudications Adjudication[] @relation("AdjusterAdjudications")
+  surveyorAssignments    CaseAssignment[] @relation("SurveyorAssignments")
+  adjudications          Adjudication[]   @relation("AdjusterAdjudications")
 }
 
 model Claim {
-  id               String   @id @default(uuid())
-  claimNumber      String   @unique
+  id          String @id @default(uuid())
+  claimNumber String @unique
 
-  customerId       String
-  customer         User     @relation(fields: [customerId], references: [id])
+  customerId String
+  customer   User   @relation(fields: [customerId], references: [id])
 
-  title            String
-  description      String
+  title       String
+  description String
 
   incidentDate     DateTime
   incidentLocation String
 
-  status           ClaimStatus @default(SUBMITTED)
+  status ClaimStatus @default(SUBMITTED)
 
-  workshopId       String?
-  workshop         Workshop? @relation(fields: [workshopId], references: [id])
+  workshopId String?
+  workshop   Workshop? @relation(fields: [workshopId], references: [id])
 
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  documents Document[]
-  appointment Appointment?
-  survey Survey?
+  documents      Document[]
+  appointment    Appointment?
+  survey         Survey?
   caseAssignment CaseAssignment?
-  adjudication Adjudication?
+  adjudication   Adjudication?
+  repair         Repair?
 }
 
 model Document {
-  id          String   @id @default(uuid())
+  id String @id @default(uuid())
 
-  fileName    String
+  fileName     String
   originalName String
-  mimeType    String
-  fileSize    Int
-  filePath    String
+  mimeType     String
+  fileSize     Int
+  filePath     String
 
-  claimId     String
-  claim       Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  claimId String
+  claim   Claim  @relation(fields: [claimId], references: [id], onDelete: Cascade)
 
-  uploadedAt  DateTime @default(now())
+  uploadedAt DateTime @default(now())
 }
 
 model Workshop {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
   address     String
   city        String
   state       String
   phoneNumber String
   email       String?
-  isActive    Boolean  @default(true)
+  isActive    Boolean @default(true)
 
-  claims Claim[]
+  claims       Claim[]
   appointments Appointment[]
+  repairs      Repair[]
 }
 
 model Appointment {
-  id              String              @id @default(cuid())
+  id String @id @default(cuid())
 
   appointmentDate DateTime
 
-  status          AppointmentStatus   @default(SCHEDULED)
+  status AppointmentStatus @default(SCHEDULED)
 
-  claimId         String              @unique
-  claim           Claim               @relation(fields: [claimId], references: [id])
+  claimId String @unique
+  claim   Claim  @relation(fields: [claimId], references: [id])
 
-  workshopId      String
-  workshop        Workshop            @relation(fields: [workshopId], references: [id])
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
 
-  createdAt       DateTime            @default(now())
+  createdAt DateTime @default(now())
 }
 
 model Survey {
-  id              String       @id @default(cuid())
+  id String @id @default(cuid())
 
-  claimId         String       @unique
-  claim           Claim        @relation(fields: [claimId], references: [id])
+  claimId String @unique
+  claim   Claim  @relation(fields: [claimId], references: [id])
 
-  surveyorId      String
-  surveyor        User         @relation(fields: [surveyorId], references: [id])
+  surveyorId String
+  surveyor   User   @relation(fields: [surveyorId], references: [id])
 
   damageDescription String
 
-  estimatedCost   Float?
+  estimatedCost Float?
 
-  reportPath      String?
+  reportPath String?
 
-  status          SurveyStatus @default(PENDING)
+  status SurveyStatus @default(PENDING)
 
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Adjudication {
-  id             String   @id @default(cuid())
-  claimId        String   @unique
+  id             String      @id @default(cuid())
+  claimId        String      @unique
   adjusterId     String
   decision       ClaimStatus
   approvedAmount Float?
   decisionReason String
-  decidedAt      DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  decidedAt      DateTime    @default(now())
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   claim    Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
   adjuster User  @relation("AdjusterAdjudications", fields: [adjusterId], references: [id])
@@ -227,4 +235,24 @@ model CaseAssignment {
 
   @@index([caseManagerId])
   @@index([surveyorId])
+}
+
+model Repair {
+  id                   String       @id @default(cuid())
+  claimId              String       @unique
+  workshopId           String
+  status               RepairStatus @default(NOT_STARTED)
+  expectedDeliveryDate DateTime?
+  startedAt            DateTime?
+  completedAt          DateTime?
+  finalBillAmount      Float?
+  repairNotes          String?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  claim    Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  workshop Workshop @relation(fields: [workshopId], references: [id])
+
+  @@index([workshopId])
+  @@index([status])
 }

@@ -6,5 +6,6 @@ import { WorkshopsRepository } from './repositories/workshops.repository';
 @Module({
   controllers: [WorkshopsController],
   providers: [WorkshopsService, WorkshopsRepository],
+  exports: [WorkshopsRepository],
 })
 export class WorkshopsModule {}
